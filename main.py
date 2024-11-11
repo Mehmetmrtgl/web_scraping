@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
+
 url = "https://bodysize.org/tr"
 
 url_request = requests.get(url)
@@ -18,6 +20,14 @@ def get_person_data(soup):
 
         return list_items
     return []
+
+def write_to_csv(data):
+    with open('output.csv', mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Ad', 'Boy', 'Ağırlık'])  # Başlık satırı
+
+        for entry in data:
+            writer.writerow(entry)
 
 first_page_items = get_person_data(soup)
 all_person_data = []
@@ -74,4 +84,5 @@ for page in range(2, 2443):
 
         all_person_data.append([name, height, weight])
 
-print(all_person_data)
+write_to_csv(all_person_data)
+print("Data saved in output.csv file.")
