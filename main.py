@@ -45,4 +45,33 @@ for item in first_page_items:
 
     all_person_data.append([name, height, weight])  # Add the person's data to the list
 
-print(all_person_data)  # Print the list of all collected data
+for page in range(2, 2443):
+    page_url = f"https://bodysize.org/tr/page/{page}/"
+    page = requests.get(page_url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    list_items = get_person_data(soup)
+
+    for item in list_items:
+        name = item.text.strip()
+        new_href = item['href'].replace('/tr/', '/')
+        person_url = url + new_href
+
+        person_page = requests.get(person_url)
+        person_soup = BeautifulSoup(person_page.text, 'html.parser')
+
+        # Boy ve Ağırlığı bul
+        height = None
+        weight = None
+        rows = person_soup.find_all('tr')
+        for row in rows:
+            header = row.find('th')
+            data = row.find('td')
+            if header and data:
+                if "Boy" in header.text:
+                    height = data.text.strip()
+                elif "Ağırlık" in header.text:
+                    weight = data.text.strip()
+
+        all_person_data.append([name, height, weight])
+
+print(all_person_data)
